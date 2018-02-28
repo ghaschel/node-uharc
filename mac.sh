@@ -14,3 +14,5 @@ command -v wine >/dev/null 2>&1 || {
     sudo chown -R $(whoami) $(brew --prefix)/*;
     brew install wine;
 }
+
+#/usr/local/Cellar/wine/3.0/bin/wine uharc.exe a -d2 -mz -md32768 -mm+ -y+ u.uha *.exe
