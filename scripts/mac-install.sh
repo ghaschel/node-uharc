@@ -25,5 +25,6 @@ command -v wine >/dev/null 2>&1 || {
     sudo chown -R $(whoami) $(brew --prefix)/*;
     brew install wine;
 
+    # get path or update bash env variables
     /usr/local/Cellar/wine/3.0/bin/wine
 }

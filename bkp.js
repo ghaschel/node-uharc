@@ -1,7 +1,5 @@
 // windows
-const nodeUharc = require('./lib/uharc.js');
-
-console.log(nodeUharc());
+const { spawn } = require('child_process');
 
 // child.stdout.setEncoding('utf8');
 // child.stdout.on('data', (chunk) => {
@@ -36,9 +34,9 @@ console.log(nodeUharc());
 // });
 
 //ubuntu
-// const child = spawn('wine', [__dirname + '/bin/uharc.exe', 'a', '-d2', '-m3', '-md32768', '-mm+', '-y+', 'u.uha', __dirname + '/bin/*.exe'], {stdio: ['ignore', 'ignore', 'ignore']});
-// // const child = spawn('open', [__dirname + '/scripts/call.command'], {detached: true, stdio: ['ignore', out, err]});
+const child = spawn('wine', [__dirname + '/bin/uharc.exe', 'a', '-d2', '-m3', '-md32768', '-mm+', '-y+', 'u.uha', __dirname + '/bin/*.exe'], {stdio: ['ignore', 'ignore', 'ignore']});
+// const child = spawn('open', [__dirname + '/scripts/call.command'], {detached: true, stdio: ['ignore', out, err]});
 
-//   child.on('close', (e) => {
-//     console.log(e);
-//   });
+  child.on('close', (e) => {
+    console.log(e);
+  });
