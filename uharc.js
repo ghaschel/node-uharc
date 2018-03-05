@@ -13,15 +13,18 @@ const uharc = config => (
         let stdOut = [];
         let cfg = {
             add: 'a',
-            verbose: '-d2',
-            compression: '-m3',
+            verbose: '-d0',
+            compression: getCompressionMode(config.compressionMode),
             buffer: '-md32768',
-            multimedia: '-mm+',
+            multimedia: config.multimediaCompression ? '-mm+' : '-mm-',
+            headerEncryption: config.headerEncryption ? '-ph+' : '-ph-',
+            clearFileArchiceAttr: config.clearFileArchiceAttr ? '-ac+' : '-ac-',
             yes: '-y+',
-            output: 'u.uha',
-            files: __dirname + '/bin/*.*'
+            recursive: config.recursive ? '-r+' : '-r-',
+            output: config.output || 'opt.uha',
+            files: __dirname + '/' + config.files
         }
-        
+
         const child = spawn(getWineCommand(), getArgs(cfg), getStdIo());
 
         child.stdout.on('data', (data) => {
@@ -92,7 +95,27 @@ function getWineCommand() {
             // @TODO check the viability and performance gain of adding a sqlite to back this up
             return execSync('brew --prefix wine').toString('utf8').replace('\n', '') + '/bin/wine';
         }
-``
+
+        default: {
+            break;
+        }
+    }
+}
+
+function getCompressionMode(mode) {
+    switch (mode) {
+        case 'ALZ': {
+            return '-m3';
+        }
+
+        case 'PPM': {
+            return '-mx';
+        }
+
+        case 'LZP': {
+            return '-mz'
+        }
+
         default: {
             break;
         }
