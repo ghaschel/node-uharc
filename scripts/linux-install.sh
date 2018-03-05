@@ -7,8 +7,9 @@ set -o nounset
 echo "Checking if wine is installed..."
 
 command -v wine >/dev/null 2>&1 || { 
-    echo >&2 "Not installed. Installing - it will ask for sudo";
+    echo "Not installed. Installing - it will ask for sudo";
     sudo apt-get --yes install wine;
     echo "Wine installed";
-    wine;
+    source ~/.bashrc
+    wine
 }

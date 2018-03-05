@@ -1,29 +1,31 @@
 const { spawn } = require('child_process');
 const { execSync } = require('child_process');
+const glob = require('glob');
 const chalk = require('chalk');
+const path = require('path');
 
 const isWin = process.platform === 'win32';
 const isLinux = process.platform === 'linux';
 const isOsx = process.platform === 'darwin';
+const defaultOutput = 'output.uha';
 const uharcPath = './bin/uharc.exe'
 
 const uharc = config => (
     new Promise((resolve, reject) => {
+        if (!isCompressionModeValid(config)) throw('ERROR: Invalid compression mode ' + config.compressionMode);
+        if (!fileExists(config.files)) throw('ERROR: File not found ' + config.files);
+
+        if (
+            typeof(config.output) !== 'undefined' &&
+            path.dirname(config.output) !== ''
+        ) {
+            if (path.dirname(config.output) === '.') config.output += '/' + defaultOutput;
+            if (!fileExists(path.dirname(config.output))) throw('ERROR: Target directory not found ' + config.output);
+        }
+
         let stdErr = [];
         let stdOut = [];
-        let cfg = {
-            add: 'a',
-            verbose: '-d0',
-            compression: getCompressionMode(config.compressionMode),
-            buffer: '-md32768',
-            multimedia: config.multimediaCompression ? '-mm+' : '-mm-',
-            headerEncryption: config.headerEncryption ? '-ph+' : '-ph-',
-            clearFileArchiceAttr: config.clearFileArchiceAttr ? '-ac+' : '-ac-',
-            yes: '-y+',
-            recursive: config.recursive ? '-r+' : '-r-',
-            output: config.output || 'opt.uha',
-            files: __dirname + '/' + config.files
-        }
+        let cfg = getCfg(config);
 
         const child = spawn(getWineCommand(), getArgs(cfg), getStdIo());
 
@@ -45,12 +47,12 @@ const uharc = config => (
                 return;
             }
             
-            // @TODO: Remove this after ready.
-            setTimeout(() => {
-                console.info(chalk.green('Compression finished'));
-                resolve(0);
-            }, 6000);
+            resolve('Compression finished');
         });
+    }).catch((error) => {
+        console.error(chalk.red(error));
+    }).then((success, error) => {
+        if (success) console.info(chalk.green(success));
     })
 );
 
@@ -88,7 +90,8 @@ function getWineCommand() {
         }
 
         case isLinux: {
-            return 'wine';
+            // @TODO check the viability and performance gain of adding a sqlite to back this up
+            return execSync('command -v wine').toString('utf8').replace('\n', '');
         }
 
         case isOsx: {
@@ -120,6 +123,40 @@ function getCompressionMode(mode) {
             break;
         }
     }
+}
+
+function fileExists(files) {
+    let exists = false;
+    let path = __dirname + '/' + files;
+    
+    files = glob.sync(path);
+
+    return files.length > 0;
+}
+
+function getCfg(config) {
+    return {
+        add: 'a',
+        verbose: '-d0',
+        compression: getCompressionMode(config.compressionMode),
+        buffer: '-md32768',
+        multimedia: config.multimediaCompression ? '-mm+' : '-mm-',
+        headerEncryption: config.headerEncryption ? '-ph+' : '-ph-',
+        clearFileArchiceAttr: config.clearFileArchiceAttr ? '-ac+' : '-ac-',
+        yes: '-y+',
+        recursive: config.recursive ? '-r+' : '-r-',
+        output: config.output || 'output.uha',
+        files: __dirname + '/' + config.files
+    };
+}
+
+function isCompressionModeValid(config) {
+    let cm = config.compressionMode;
+
+    if (typeof(cm) === 'undefined') return false;
+    if (cm !== 'LZP' || cm !== 'PPM' || cm !== 'ALZ') return false;
+
+    return true;
 }
 
 module.exports = uharc;
