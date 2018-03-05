@@ -1,3 +1,3 @@
-const nodeUharc = require('./lib/uharc.js');
+const nodeUharc = require('./uharc.js');
 
 nodeUharc();
