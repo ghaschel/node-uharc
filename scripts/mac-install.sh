@@ -1,29 +1,43 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 set -o errexit
 set -o pipefail
 set -o nounset
 
-echo "Checking if wine is installed..."
-command -v wine >/dev/null 2>&1 || { 
-    echo "Wine not installed.";
-    echo "Checking if HomeBrew is installed...";
-
-    command -v brew >/dev/null 2>&1 || {
-        echo "Brew not installed. Installing.";
-        /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)";
-    }
-
-    echo "Checking if xquartz is isntalled...";
-    command -v xquartz >/dev/null 2>&1 || {
-        echo "xquartz not installed. Installing.";
-        brew cask install xquartz;
-    }
-
-    echo "Installing wine. It will ask for sudo";
-    sudo mkdir /usr/local/Cellar;
-    sudo chown -R $(whoami) $(brew --prefix)/*;
-    brew install wine;
-
-    /usr/local/Cellar/wine/3.0/bin/wine
+function installBrew {
+    echo "Brew not installed. Installing."
+    $(which ruby) -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 }
+
+function installWine {
+    if [[ ! -d /usr/local/Cellar ]]
+    then
+        sudo mkdir /usr/local/Cellar;
+    fi
+    sudo chown -R $(whoami) $(brew --prefix)/*;
+    /usr/local/bin/brew install wine;
+
+    # at first run wine will generate its necessary config files
+    echo "Generating wine config files"
+    $(/usr/local/bin/brew --prefix wine)/bin/wine &>/dev/null
+}
+
+echo "Checking if brew is installed..."
+if [[ -f /usr/local/bin/brew ]]
+then
+    echo "Brew installed"
+    echo "Checking if wine is installed"
+    /usr/local/bin/brew --prefix wine >/dev/null
+    if [[ $? -eq 0 ]]
+    then
+        echo "Wine already installed"
+    else
+        echo "Wine not installed. Installing. It will ask for sudo"
+        installWine
+    fi
+else
+    echo "Not installed. Installing Homebrew - It will ask for sudo"
+    installBrew
+    echo "Installing wine. - It will ask for sudo"
+    installWine
+fi
