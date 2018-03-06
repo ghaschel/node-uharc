@@ -1,4 +1,4 @@
-import { spawnSync } from 'child_process';
+const { spawnSync } = require('child_process');
 
 const isWin = process.platform === 'win32';
 const isLinux = process.platform === 'linux';

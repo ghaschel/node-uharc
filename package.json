@@ -7,8 +7,12 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "postinstall": "node ./scripts/postinstall.js"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Guilherme Haschel",
+  "license": "MIT",
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/ghaschel/node-uharc.git"
+  },
   "dependencies": {
     "chalk": "^2.3.2",
     "glob": "^7.1.2"

@@ -2,7 +2,7 @@ const nodeUharc = require('./uharc.js');
 
 nodeUharc({
     files: 'bin/',
-    output: 'scripts/output.uha',
+    output: './scrsssipts/asdasd',
     compressionMode: 'LZP',
     headerEncryption: true,
     recursive: true,

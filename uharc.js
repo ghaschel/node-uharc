@@ -15,12 +15,10 @@ const uharc = config => (
         if (!isCompressionModeValid(config)) throw('ERROR: Invalid compression mode ' + config.compressionMode);
         if (!fileExists(config.files)) throw('ERROR: File not found ' + config.files);
 
-        if (
-            typeof(config.output) !== 'undefined' &&
+        if (typeof(config.output) !== 'undefined' &&
             path.dirname(config.output) !== ''
         ) {
-            if (path.dirname(config.output) === '.') config.output += '/' + defaultOutput;
-            if (!fileExists(path.dirname(config.output))) throw('ERROR: Target directory not found ' + config.output);
+            if (!fileExists(path.dirname(config.output))) throw('ERROR: Target directory not found ' + path.dirname(config.output));
         }
 
         let stdErr = [];
@@ -151,12 +149,11 @@ function getCfg(config) {
 }
 
 function isCompressionModeValid(config) {
-    let cm = config.compressionMode;
+    let cm = config.compressionMode.toUpperCase();
 
     if (typeof(cm) === 'undefined') return false;
-    if (cm !== 'LZP' || cm !== 'PPM' || cm !== 'ALZ') return false;
-
-    return true;
+    
+    return (cm === 'LZP' || cm === 'PPM' || cm === 'ALZ');
 }
 
 module.exports = uharc;
