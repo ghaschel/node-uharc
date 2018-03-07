@@ -2,7 +2,7 @@
   "name": "node-uharc",
   "version": "0.0.1",
   "description": "Node wrapper for uharc (and also for it's use with wine)",
-  "main": "index.js",
+  "main": "uharc.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "postinstall": "node ./scripts/postinstall.js"
