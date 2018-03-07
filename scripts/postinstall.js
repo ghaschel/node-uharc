@@ -8,7 +8,7 @@ const isOsx = process.platform === 'darwin';
 const postinstall = () => {
     if (isLinux) {
         console.info('Running linux post install script');
-        spawnSync('./linux-install.sh', [], {
+        spawnSync(__dirname + '/linux-install.sh', [], {
             cwd: process.cwd(),
             env: process.env,
             stdio: 'inherit',
