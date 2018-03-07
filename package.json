@@ -1,6 +1,6 @@
 {
   "name": "node-uharc",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Node wrapper for uharc (and also for it's use with wine)",
   "main": "uharc.js",
   "scripts": {
