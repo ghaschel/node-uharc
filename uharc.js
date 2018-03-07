@@ -37,10 +37,13 @@ const uharc = config => (
         let stdOut = [];
         let cfg = getCfg(config);
 
+        console.log(cfg);
+
         const child = spawn(getWineCommand(), getArgs(cfg), getStdIo());
 
         child.stdout.on('data', (data) => {
             stdOut.push(data.toString('utf8'));
+            console.log(data.toString('utf8'));
         });
 
         child.stderr.on('data', (data) => {
@@ -55,6 +58,13 @@ const uharc = config => (
             if (e !== 0 && stdErr && stdErr.length) {
                 reject(stdErr.join(''));
                 return;
+            }
+
+            if (!isWin) {
+                // Uharc via wine will consider
+                // full unix file path as a switch
+                // so we move it to the output folder
+                execSync('mv ' + defaultOutput + ' ' + config.output);
             }
             
             resolve('Compression finished');
@@ -148,6 +158,8 @@ function fileExists(path) {
 }
 
 function getCfg(config) {
+    let opt = isWin ? config.output : null;
+    
     return {
         add: 'a',
         verbose: '-d2',
@@ -158,7 +170,7 @@ function getCfg(config) {
         clearFileArchiceAttr: config.clearFileArchiceAttr ? '-ac+' : '-ac-',
         yes: '-y+',
         recursive: config.recursive ? '-r+' : '-r-',
-        output: config.output || 'output.uha',
+        output: opt || defaultOutput,
         files: config.files
     };
 }
