@@ -3,22 +3,34 @@ const { execSync } = require('child_process');
 const glob = require('glob');
 const chalk = require('chalk');
 const path = require('path');
+const fs = require('fs');
 
 const isWin = process.platform === 'win32';
 const isLinux = process.platform === 'linux';
 const isOsx = process.platform === 'darwin';
 const defaultOutput = 'output.uha';
-const uharcPath = './bin/uharc.exe'
+const uharcPath = __dirname + '/bin/uharc.exe'
 
 const uharc = config => (
     new Promise((resolve, reject) => {
         if (!isCompressionModeValid(config)) throw('ERROR: Invalid compression mode ' + config.compressionMode);
-        if (!fileExists(config.files)) throw('ERROR: File not found ' + config.files);
+
+        config.output = path.dirname(process.mainModule.filename) + '/' + config.output;
+        config.files = path.dirname(process.mainModule.filename) + '/' + config.files;
+
+        if (isWin) {
+            config.files = config.files.replace(/\//g, '\\');
+            config.output = config.output.replace(/\//g, '\\');
+        }
+
+        if (!fileExists(getUnixPath(config.files))) throw('ERROR: File not found ' +  config.files);
 
         if (typeof(config.output) !== 'undefined' &&
             path.dirname(config.output) !== ''
         ) {
-            if (!fileExists(path.dirname(config.output))) throw('ERROR: Target directory not found ' + path.dirname(config.output));
+            if (!fileExists(path.dirname(getUnixPath(config.output)))) throw('ERROR: Target directory not found ' + path.dirname(config.output));
+        } else {
+            output = path.dirname(process.mainModule.filename) + '/' + config.output;
         }
 
         let stdErr = [];
@@ -53,6 +65,12 @@ const uharc = config => (
         if (success) console.info(chalk.green(success));
     })
 );
+
+function getUnixPath(path) {
+    if (!isWin) return path;
+
+    return path.replace(/\\/g, '/');
+}
 
 function getArgs(cfg) {
     let arr = [];
@@ -123,11 +141,8 @@ function getCompressionMode(mode) {
     }
 }
 
-function fileExists(files) {
-    let exists = false;
-    let path = __dirname + '/' + files;
-    
-    files = glob.sync(path);
+function fileExists(path) {
+    let files = glob.sync(path);
 
     return files.length > 0;
 }
@@ -135,7 +150,7 @@ function fileExists(files) {
 function getCfg(config) {
     return {
         add: 'a',
-        verbose: '-d0',
+        verbose: '-d2',
         compression: getCompressionMode(config.compressionMode),
         buffer: '-md32768',
         multimedia: config.multimediaCompression ? '-mm+' : '-mm-',
@@ -144,7 +159,7 @@ function getCfg(config) {
         yes: '-y+',
         recursive: config.recursive ? '-r+' : '-r-',
         output: config.output || 'output.uha',
-        files: __dirname + '/' + config.files
+        files: config.files
     };
 }
 
