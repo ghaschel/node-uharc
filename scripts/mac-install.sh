@@ -27,8 +27,7 @@ if [[ -f /usr/local/bin/brew ]]
 then
     echo "Brew installed"
     echo "Checking if wine is installed"
-    /usr/local/bin/brew --prefix wine >/dev/null
-    if [[ $? -eq 0 ]]
+    if brew ls --versions wine > /dev/null;
     then
         echo "Wine already installed"
     else
