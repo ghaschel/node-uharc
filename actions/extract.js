@@ -1,27 +1,20 @@
 const { spawn } = require('child_process');
-const { execSync } = require('child_process');
 const chalk = require('chalk');
-const path = require('path');
 const isWin = process.platform === 'win32';
-const defaultOutput = 'output.uha';
 const util = require('../utiilities.js')
 
 const extract = config => {
   new Promise((resolve, reject) => {
     config.output = config.output;
-    config.files = config.files;
-
-    if (isWin) {
-      config.files = config.files.replace(/\//g, '\\');
-    }
+    config.files = isWin ? config.files.replace(/\//g, '\\') : config.files;
 
     if (!util.fileExists(util.getUnixPath(config.files))) {
       throw(`ERROR: File not found ${config.files}`);
     }
 
-    let stdErr = [];
-    let stdOut = [];
-    let cfg = util.getExtractCfg(config);
+    const stdErr = [];
+    const stdOut = [];
+    const cfg = util.getExtractCfg(config);
 
     const child = spawn(util.getWineCommand(), util.getArgs(cfg), util.getStdIo());
 
@@ -36,14 +29,7 @@ const extract = config => {
       // we have to test if e !== 0 because even so the child process finished just fine
       // FIXME errors outputed by wine are added to stdErr and will end up creating a false positive
       if (e !== 0 && stdErr && stdErr.length) {
-        reject(stdErr.join(''));
-        return;
-      }
-
-      //TODO FIX THIS
-      if (!isWin) {
-        // Uharc via wine will consider full unix file path as a switch so we move it to the output folder
-        execSync(`mv ${defaultOutput} ${config.output}`);
+        return reject(stdErr.join(''));
       }
 
       resolve('Extract finished');

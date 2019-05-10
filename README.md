@@ -1,7 +1,6 @@
 # node-uharc
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![npm version](https://badge.fury.io/js/node-uharc.svg)](https://badge.fury.io/js/node-uharc)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![npm version](https://badge.fury.io/js/node-uharc.svg)](https://badge.fury.io/js/node-uharc)
 
 Node-uharc is a Node.JS wrapper for Uharc. It uses wine for Unix-based system compatibility.
 
@@ -19,21 +18,33 @@ It will ask for sudo to install HomeBrew.
 
 # How to use
 
+#### Compress
 
 ```
 const nodeUharc = require('node-uharc');
 
 nodeUharc({
-    files: 'bin/', // files or folder to compress (wildcards are supported)
-    output: './output/opt.uha', // output file
-    compressionMode: 'LZP', // LZP or ALZ or PPM
-    headerEncryption: true, // archive header encryption
-    recursive: true, //should include subfolders
-    clearFileArchiceAttr: true, // clear file archive attr
-    multimediaCompression: true  // enable multimedia detection and compression
+  action: 'compress',
+  files: './*', // files or folder to compress (wildcards are supported)
+  output: './bin/opt.uha', // output file
+  compressionMode: 'LZP', // LZP or ALZ or PPM
+  headerEncryption: true, // archive header encryption
+  recursive: true, //should include subfolders
+  clearFileArchiceAttr: true, // clear file archive attr
+  multimediaCompression: true  // enable multimedia detection and compression
 })
 ```
 
+#### Extract
+```
+nodeUharc({
+  action: 'extract',
+  files: './bin/opt.uha', // files or folder to extract (wildcards are supported)
+  output: '../tst', // output folder  
+})
+```
+
+## [Changelog](CHANGELOG.md)
 
 License
 ----

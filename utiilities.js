@@ -7,9 +7,11 @@ const defaultOutput = 'output.uha';
 const uharcPath = `${__dirname}/bin/uharc.exe`
 
 const getUnixPath = path => {
-  if (!isWin) return path;
+  if (isWin) {
+    return path.replace(/\\/g, '/');
+  }
 
-  return path.replace(/\\/g, '/');
+  return path;
 }
 
 const getArgs = cfg => {
@@ -24,10 +26,8 @@ const getArgs = cfg => {
 const getStdIo = () => {
   if (!isWin) {
     // TODO: Test if it still works for ubuntu.
-    // I know it's ugly to leave stdin as inherit,
-    // but it's this or a lot of unwanted output.
-    // It just hangs if handled the proper way.
-    // Probably some wine limitation.
+    // I know it's ugly to leave stdin as inherit, but it's this or a lot of unwanted output.
+    // It just hangs if handled the proper way. Probably some wine limitation.
     return { stdio: ['inherit', 'pipe', 'pipe'] };
   } else {
     return { stdio: ['ignore', 'pipe', 'pipe'] };
@@ -60,7 +60,8 @@ const fileExists = path => {
 }
 
 const getCompressCfg = config => {
-  let opt = isWin ? config.output : null;
+  //let opt = isWin ? config.output : null;
+  let opt = config.output;
   return {
     add: 'a',
     verbose: '-d2',
@@ -80,7 +81,6 @@ const getCompressCfg = config => {
 const getExtractCfg = config => {
   return {
     extract: 'x',
-    verbose: '-d2',
     overwrite: '-o-',
     output: `-t${config.output}`,
     memory: '-vm+',
@@ -96,4 +96,13 @@ const isCompressionModeValid = config => {
   return (cm === 'LZP' || cm === 'PPM' || cm === 'ALZ');
 }
 
-module.exports = { getUnixPath, getArgs, getStdIo, getWineCommand, fileExists, getCompressCfg, getExtractCfg, isCompressionModeValid }
+module.exports = { 
+  getUnixPath,
+  getArgs,
+  getStdIo,
+  getWineCommand,
+  fileExists,
+  getCompressCfg,
+  getExtractCfg,
+  isCompressionModeValid
+}
