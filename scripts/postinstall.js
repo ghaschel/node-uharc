@@ -16,18 +16,11 @@ const postinstall = () => {
         });
     } else if (isOsx) {
         console.info('Running osx post install script');
-        let install = spawn(__dirname + '/mac-install.sh');
-
-        install.stdout.on('data', function (data) {
-            console.info(data.toString('utf8'));
-        });
-
-        install.stderr.on('data', function (data) {
-            console.info(data.toString('utf8'));
-        });
-
-        install.on('exit', function (code) {
-            console.info('node-uharc install finished');
+        spawnSync(__dirname + '/mac-install.sh', [], {
+            cwd: process.cwd(),
+            env: process.env,
+            stdio: 'inherit',
+            encoding: 'utf-8'
         });
     }
 }
